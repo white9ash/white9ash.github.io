@@ -1,0 +1,895 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="white9ash">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="审计之前的准备掌握语法首先需要对PHP要有一个较为深刻的认识。掌握PHP的语法是基础，其次，需要了解PHP的特点（与其他语言的不同之处），整体而言，我认为PHP的语法和其他语言的差别还是比较大的。个人认为，代码审计实则也是个逆向的过程，如果连正向知识都不清楚，逆向也不会有太好的结果。 PHP安全相关配置PHP_INI_常量定义    常量 含义    PHP_INI_USER 在用户的PHP脚本或">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP代码审计简单总结">
+<meta property="og:url" content="http://white9ash.fun/2023/01/01/PHP%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%E7%AE%80%E5%8D%95%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="white9ash&#39;blog">
+<meta property="og:description" content="审计之前的准备掌握语法首先需要对PHP要有一个较为深刻的认识。掌握PHP的语法是基础，其次，需要了解PHP的特点（与其他语言的不同之处），整体而言，我认为PHP的语法和其他语言的差别还是比较大的。个人认为，代码审计实则也是个逆向的过程，如果连正向知识都不清楚，逆向也不会有太好的结果。 PHP安全相关配置PHP_INI_常量定义    常量 含义    PHP_INI_USER 在用户的PHP脚本或">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-02-20T15:41:44.500Z">
+<meta property="article:author" content="white9ash">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="代码审计">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>PHP代码审计简单总结 - white9ash&#39;blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"white9ash.fun","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"COMhCE96F35q0yVCpJzBObZb-MdYXbMMI","app_key":"OUD3nHH8v5VFszcsJe1RKDTjybOD4l5wG8rJeF465lcPwcEW","server_url":null,"path":"/","ignore_local":true}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Home</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="PHP代码审计简单总结"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-01 00:00" pubdate>
+          2023年1月1日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          55 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">PHP代码审计简单总结</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="审计之前的准备"><a href="#审计之前的准备" class="headerlink" title="审计之前的准备"></a>审计之前的准备</h3><h4 id="掌握语法"><a href="#掌握语法" class="headerlink" title="掌握语法"></a>掌握语法</h4><p>首先需要对PHP要有一个较为深刻的认识。掌握PHP的语法是基础，其次，需要了解PHP的特点（与其他语言的不同之处），整体而言，我认为PHP的语法和其他语言的差别还是比较大的。个人认为，代码审计实则也是个逆向的过程，如果连正向知识都不清楚，逆向也不会有太好的结果。</p>
+<h4 id="PHP安全相关配置"><a href="#PHP安全相关配置" class="headerlink" title="PHP安全相关配置"></a>PHP安全相关配置</h4><p>PHP_INI_常量定义</p>
+<table>
+<thead>
+<tr>
+<th>常量</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PHP_INI_USER</td>
+<td>在用户的PHP脚本或Windows注册表中设置</td>
+</tr>
+<tr>
+<td>PHP_INT_PERDIR</td>
+<td>在php.ini .htaccess 或httpd.conf中设置</td>
+</tr>
+<tr>
+<td>PHP_INI_SYSTEM</td>
+<td>在php.ini 或.htaccess中设置</td>
+</tr>
+<tr>
+<td>PHP_INI_ALL</td>
+<td>在任何地方设置</td>
+</tr>
+<tr>
+<td>php.ini only</td>
+<td>仅可在php.ini中配置</td>
+</tr>
+<tr>
+<td>register_globals</td>
+<td></td>
+</tr>
+<tr>
+<td>PHP版本5.4.0之前存在，将GET、POST提交的参数作为全局变量并初始化值。</td>
+<td></td>
+</tr>
+</tbody></table>
+<ol>
+<li>register_globals</li>
+</ol>
+<p>PHP版本5.4.0之前存在，将GET、POST提交的参数作为全局变量并初始化值。</p>
+<ol start="2">
+<li>allow_url_include</li>
+</ol>
+<p>该配置表示是否允许包含远程文件（影响较大）。</p>
+<ol start="3">
+<li>magic_quotes_gpc</li>
+</ol>
+<p>PHP版本5.4.0之前存在，魔术引号，将GET、POST、COOKIE变量中的单引号、双引号、反斜杠、空字符前加上<code>\</code>,该配置并不会作用于$_SERVER变量，所以会导致一些漏洞。</p>
+<ol start="4">
+<li>magic_quotes_runtime</li>
+</ol>
+<p>PHP版本5.4.0之前存在，与magic_quotes_gpc类似，区别在于magic_quotes_runtime只作用于从数据库或文件中获取的数据，可用于预防二次注入。</p>
+<p>受影响的函数：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-title function_ invoke__">get_meta_tags</span>()<br><span class="hljs-title function_ invoke__">file_get_contents</span>()<br><span class="hljs-title function_ invoke__">file</span>()<br><span class="hljs-title function_ invoke__">fgets</span>()<br><span class="hljs-title function_ invoke__">fwrite</span>()<br><span class="hljs-title function_ invoke__">fread</span>()<br><span class="hljs-title function_ invoke__">fputcsv</span>()<br><span class="hljs-title function_ invoke__">stream_socket_recvfrom</span>()<br><span class="hljs-title function_ invoke__">exec</span>()<br><span class="hljs-title function_ invoke__">system</span>()<br><span class="hljs-title function_ invoke__">passthru</span>()<br><span class="hljs-title function_ invoke__">stream_get_contents</span>()<br><span class="hljs-title function_ invoke__">bzread</span>()<br><span class="hljs-title function_ invoke__">gzfile</span>()<br><span class="hljs-title function_ invoke__">gzgets</span>()<br><span class="hljs-title function_ invoke__">gzwrite</span>()<br><span class="hljs-title function_ invoke__">gzread</span>()<br><span class="hljs-title function_ invoke__">exif_read_data</span>()<br><span class="hljs-title function_ invoke__">dba_insert</span>()<br><span class="hljs-title function_ invoke__">dba_replace</span>()<br><span class="hljs-title function_ invoke__">dba_fetch</span>()<br><span class="hljs-title function_ invoke__">ibase_fetch_row</span>()<br><span class="hljs-title function_ invoke__">ibase_fetch_assoc</span>()<br><span class="hljs-title function_ invoke__">ibase_fetch_object</span>()<br><span class="hljs-title function_ invoke__">mssql_fetch_row</span>()<br><span class="hljs-title function_ invoke__">mssql_fetch_object</span>()<br><span class="hljs-title function_ invoke__">mssql_fetch_array</span>()<br><span class="hljs-title function_ invoke__">mssql_fetch_assoc</span>()<br><span class="hljs-title function_ invoke__">mysqli_fetch_row</span>()<br><span class="hljs-title function_ invoke__">mysqli_fetch_array</span>()<br><span class="hljs-title function_ invoke__">mysqli_fetch_assoc</span>()<br><span class="hljs-title function_ invoke__">mysqli_fetch_object</span>()<br><span class="hljs-title function_ invoke__">pg_fetch_row</span>()<br><span class="hljs-title function_ invoke__">pg_fetch_assoc</span>()<br><span class="hljs-title function_ invoke__">pg_fetch_array</span>()<br><span class="hljs-title function_ invoke__">pg_fetch_object</span>()<br><span class="hljs-title function_ invoke__">pg_fetch_all</span>()<br><span class="hljs-title function_ invoke__">pg_select</span>()<br><span class="hljs-title function_ invoke__">sybase_fetch_object</span>()<br><span class="hljs-title function_ invoke__">sybase_fetch_array</span>()<br><span class="hljs-title function_ invoke__">sybase_fetch_assoc</span>()<br><span class="hljs-title class_">SplFileObject</span>::<span class="hljs-title function_ invoke__">fgets</span>()<br><span class="hljs-title class_">SplFileObject</span>::<span class="hljs-title function_ invoke__">fgetcsv</span>()<br><span class="hljs-title class_">SplFileObject</span>::<span class="hljs-title function_ invoke__">fwrite</span>()<br></code></pre></td></tr></table></figure>
+
+
+
+
+<ol start="5">
+<li>magic_quotes_sybase</li>
+</ol>
+<p>PHP版本5.4.0之前存在。该配置如果开起，会覆盖magic_quotes_gpc的效果，与其相比，magic_quotes_sybase只对空字符进行了转义，并把单引号变为双引号。使用的的较少。</p>
+<ol start="6">
+<li>safe_mode</li>
+</ol>
+<p>PHP版本5.4.0之前存在。在安全模式下，一些尝试访问文件系统的函数和功能将被限制。受限制的函数如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-title function_ invoke__">dbase_open</span>()<br><span class="hljs-title function_ invoke__">filepro</span>()<br><span class="hljs-title function_ invoke__">filepro_rowcount</span>()<br><span class="hljs-title function_ invoke__">filepro_retrieve</span>()<br><span class="hljs-title function_ invoke__">pg_lo_import</span>()<br><span class="hljs-title function_ invoke__">posix_mkfifo</span>()<br><span class="hljs-title function_ invoke__">putenv</span>()<br><span class="hljs-title function_ invoke__">putenv</span>()<br><span class="hljs-title function_ invoke__">move_uploaded_file</span>()<br><span class="hljs-title function_ invoke__">chdir</span>()<br><span class="hljs-title function_ invoke__">dl</span>()<br><span class="hljs-title function_ invoke__">shell_exec</span>()<br><span class="hljs-title function_ invoke__">exec</span>()<br><span class="hljs-title function_ invoke__">escapeshellcmd</span>()<br><span class="hljs-title function_ invoke__">system</span>()<br><span class="hljs-title function_ invoke__">escapeshellcmd</span>()<br><span class="hljs-title function_ invoke__">passthru</span>()<br><span class="hljs-title function_ invoke__">escapeshellcmd</span>()<br><span class="hljs-title function_ invoke__">popen</span>()<br><span class="hljs-title function_ invoke__">escapeshellcmd</span>()<br><span class="hljs-title function_ invoke__">fopen</span>()<br><span class="hljs-title function_ invoke__">mkdir</span>()<br><span class="hljs-title function_ invoke__">rmdir</span>()<br><span class="hljs-title function_ invoke__">rename</span>()<br><span class="hljs-title function_ invoke__">unlink</span>()<br><span class="hljs-title function_ invoke__">copy</span>()<br><span class="hljs-title function_ invoke__">chgrp</span>()<br><span class="hljs-title function_ invoke__">chown</span>()<br><span class="hljs-title function_ invoke__">chmod</span>()<br><span class="hljs-title function_ invoke__">touch</span>()<br><span class="hljs-title function_ invoke__">symlink</span>()<br><span class="hljs-title function_ invoke__">link</span>()<br><span class="hljs-title function_ invoke__">apache_request_headers</span>()<br><span class="hljs-title function_ invoke__">header</span>()<br><span class="hljs-title function_ invoke__">highlight_file</span>()<br><span class="hljs-title function_ invoke__">show_source</span>()<br><span class="hljs-title function_ invoke__">parse_ini_file</span>()<br><span class="hljs-title function_ invoke__">set_time_limit</span>()<br><span class="hljs-title function_ invoke__">mail</span>()<br><span class="hljs-title function_ invoke__">session_start</span>()<br></code></pre></td></tr></table></figure>
+
+<p>在php安全模式打开的时候，需要包含一些文件时，可以使用safe_mode_include_dir指令来配置包含的路径；需要执行系统程序的时候，必须是在safe_mode_exec_dir选项指定目录的程序，否则执行将失败。即使允许执行，那么也会自动的传递给escapeshellcmd函数进行过滤。</p>
+<ol start="7">
+<li>open_basedir</li>
+</ol>
+<p>该配置来限制PHP可以访问的目录，以分号间隔。注意用open_basedir指定的限制实际上是前缀,而不是目录名。<br>举例来说: 若”open_basedir &#x3D; &#x2F;dir&#x2F;user”, 那么目录 “&#x2F;dir&#x2F;user” 和 “&#x2F;dir&#x2F;user1”都是<br>可以访问的。所以如果要将访问限制在仅为指定的目录，请用斜线结束路径名。（所以open_basedir有许多绕过方法）。</p>
+<ol start="8">
+<li>disable_functions</li>
+</ol>
+<p>通过该配置可以禁止危险函数如dl()函数等，以逗号隔开。</p>
+<ol start="9">
+<li>display_errors和erroe_reporting</li>
+</ol>
+<p>表明是否显示PHP脚本的内部错误。在生产环境中建议关闭回显。</p>
+<h3 id="代码审计工具"><a href="#代码审计工具" class="headerlink" title="代码审计工具"></a>代码审计工具</h3><p>为了提高审计效率，一个好的代码审计工具必不可少。代码审计需要的功能不过就是全局搜索、函数定位、变量跟踪、调试等。其实大部分代码编辑器都能做到。比较方便的有VS code、Seay等。目前还有一款非常强大的代码审计工具codeQL，支持很多语言，但不支持PHP，在审计其他语言时非常好用，有一定的学习成本。</p>
+<h3 id="审计思路"><a href="#审计思路" class="headerlink" title="审计思路"></a>审计思路</h3><ul>
+<li><p>敏感关键字回溯参数传递过程。<br>在审计之前，就应该对危险函数有个认识，按照checklist定位危险函数是比较常用的手段。</p>
+</li>
+<li><p>查找可控变量，正向追踪变量传递过程。<br>一切漏洞的缘由在于攻击者有可控的变量，正向追踪用户传递的变量，查看变量经过的函数、分析变量的生命周期。</p>
+</li>
+<li><p>寻找敏感功能点，通读功能点代码。<br>什么样的功能决定了什么样的漏洞，根据业务应用的逻辑来缩小审计的范围。对寻找逻辑漏洞也很有帮助。</p>
+</li>
+<li><p>直接通读全文代码。<br>能够清楚地了解整个代码的逻辑及其架构，审计也会更加全面，但比较耗时。</p>
+</li>
+</ul>
+<h3 id="漏洞挖掘"><a href="#漏洞挖掘" class="headerlink" title="漏洞挖掘"></a>漏洞挖掘</h3><h4 id="sql注入"><a href="#sql注入" class="headerlink" title="sql注入"></a>sql注入</h4><p>首先明确漏洞出现的地方，有与数据库交互的地方，就可能存在sql注入。对于sql注入漏洞而言，一般采用关键字回溯来审计，通过关键字搜索如select、update等sql语句迅速定位。然后检查是否存在用户可控的变量，如果存在，是否有安全完整的过滤。是否存在宽字节、二次注入等问题。</p>
+<h5 id="漏洞防范"><a href="#漏洞防范" class="headerlink" title="漏洞防范"></a>漏洞防范</h5><ol>
+<li><p>对于字符型注入，可以使用gpc；对于数字型注入，可使用intval等强制类型转换。</p>
+</li>
+<li><p>编写过滤函数和类。过滤一定要严谨，且正确的使用。</p>
+</li>
+</ol>
+<p>过滤时可参考addslashes()、mysql_escape_string()、mysql_real_escape_string()、intval()等。</p>
+<ol start="3">
+<li>采用预编译的方式（最好）。</li>
+</ol>
+<h4 id="XSS"><a href="#XSS" class="headerlink" title="XSS"></a>XSS</h4><p>XSS漏洞是一个较难完全防范的点，要挖掘XSS漏洞主要要定位一些输出函数，如</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">print</span>()、<span class="hljs-title function_ invoke__">print_r</span>()、<span class="hljs-keyword">echo</span>()、<span class="hljs-title function_ invoke__">printf</span>()、<span class="hljs-title function_ invoke__">sprintf</span>()、<span class="hljs-keyword">die</span>()、<span class="hljs-title function_ invoke__">var_dump</span>()、<span class="hljs-title function_ invoke__">var_export</span>()<br></code></pre></td></tr></table></figure>
+
+<p>另外，仍然需要注意用户传入的参数。包括反射型、存储型，留意变量的变化。测试过滤函数或类是否过滤完全、能否绕过。特殊地，DOM型XSS由于不经过后端，所以难以防范。需要对前端代码进行审计。</p>
+<h5 id="漏洞防范-1"><a href="#漏洞防范-1" class="headerlink" title="漏洞防范"></a>漏洞防范</h5><p>需要过滤的字符有<code>&#39;</code>、<code>&quot;</code>、 <code>&lt;&gt;</code>、 <code>\</code>、 <code>:</code>、 <code>&amp;</code>、 <code>#</code>。还需要加入白名单（最好）或黑名单来过滤标签事件，如果匹配成功，则直接拦截，而非替换为空。</p>
+<h4 id="CSRF漏洞"><a href="#CSRF漏洞" class="headerlink" title="CSRF漏洞"></a>CSRF漏洞</h4><p>csrf漏洞主要在于已经登陆过的用户去进行的一些操作（是携带了个人信息）。所以主要关注整个系统是否使用了token的保护机制，以及是否正确的使用token。csrf漏洞配合黑盒测试会更加直接一些，能够快速确定漏洞是否存在。</p>
+<h5 id="漏洞防范-2"><a href="#漏洞防范-2" class="headerlink" title="漏洞防范"></a>漏洞防范</h5><ol>
+<li><p>使用并正确的使用token。</p>
+</li>
+<li><p>添加referer等字段。</p>
+</li>
+<li><p>添加验证码。（破坏用户体验）</p>
+</li>
+</ol>
+<h4 id="文件操作漏洞"><a href="#文件操作漏洞" class="headerlink" title="文件操作漏洞"></a>文件操作漏洞</h4><ol>
+<li>文件包含漏洞</li>
+</ol>
+<p>文件包含漏洞主要设计到4个函数</p>
+<ul>
+<li>include()</li>
+<li>include_once()</li>
+<li>require()</li>
+<li>require_once()</li>
+</ul>
+<p>主要回溯查看这四个函数的参数是否有可控变量。还需要注意是否存在包含截断漏洞如%00截断、？截断等。</p>
+<ol start="2">
+<li>文件读取（下载）漏洞</li>
+</ol>
+<p>该类漏洞仍然需要着重关注相关函数如</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-title function_ invoke__">file_get_contents</span>()<br><span class="hljs-title function_ invoke__">highlight_file</span>()<br><span class="hljs-title function_ invoke__">fopen</span>()<br><span class="hljs-title function_ invoke__">readfile</span>()<br><span class="hljs-title function_ invoke__">fread</span>()<br><span class="hljs-title function_ invoke__">fgetss</span>()<br><span class="hljs-title function_ invoke__">fgets</span>()<br><span class="hljs-title function_ invoke__">parse_ini_file</span>()<br><span class="hljs-title function_ invoke__">show_source</span>()<br><span class="hljs-title function_ invoke__">file</span>()<br></code></pre></td></tr></table></figure>
+
+
+
+<ol start="3">
+<li>文件上传漏洞</li>
+</ol>
+<p>一般web应用需要用到上传功能的地方很少，在上传头像的地方较多。关于上传的函数就只有move_uploaded_file()一个，主要定位该函数即可。</p>
+<ol start="4">
+<li>文件删除漏洞</li>
+</ol>
+<p>通常与unlink()和session_destroy()有关。文件删除漏洞和文件的读取漏洞基本类似，只是函数不同而已，一般导致的原因是可以使用..&#x2F;向上级目录跳转；或者是没有限制当前用户的删除权限，导致当前用户可以越权删除不属于他的文件。</p>
+<h5 id="漏洞防范-3"><a href="#漏洞防范-3" class="headerlink" title="漏洞防范"></a>漏洞防范</h5><p>文件操作漏洞常见的三个问题：</p>
+<ol>
+<li><p>越权操作未授权的文件。</p>
+</li>
+<li><p>在请求中直接传入文件名。</p>
+</li>
+<li><p>操作更多文件需要跳转目录。</p>
+</li>
+</ol>
+<p>针对以上三个容易出现的问题，可以制定对应的防御手段：</p>
+<ol>
+<li><p>对权限的管理要合理，例如，用户不能删除同级的其他用户的文件，只能操作自己的文件；特殊文件（后台文件）只允许管理员操作。</p>
+</li>
+<li><p>文件操作没必要传参时直接传入文件名，如?dfile&#x3D;123.jpg，可以采用更好的方式，如数据库储存md5等。</p>
+</li>
+<li><p>禁止目录跳转，禁止参数中有..&#x2F; 之类的跳转操作。</p>
+</li>
+</ol>
+<p>对应文件上传漏洞，建议使用白名单进行过滤。另外，还可以采用隐藏路径、随机命名、二次渲染来完善防御。</p>
+<h4 id="代码执行漏洞"><a href="#代码执行漏洞" class="headerlink" title="代码执行漏洞"></a>代码执行漏洞</h4><p>代码执行漏洞危害很大，相当于直接有了webshell。代码执行就是执行PHP代码。一般采用关键字回溯的方式进行挖掘。其相关的函数有：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">eval</span>()<br><span class="hljs-title function_ invoke__">assert</span>()<br><span class="hljs-title function_ invoke__">preg_replace</span>()<br><span class="hljs-title function_ invoke__">call_user_func</span>()<br><span class="hljs-title function_ invoke__">call_user_func_array</span>()<br><span class="hljs-title function_ invoke__">array_map</span>()<br></code></pre></td></tr></table></figure>
+
+<p>另外还有动态函数$a($b)也会导致代码执行，在挖掘该类漏洞时，需要找到可控的动态函数名。</p>
+<p>call_user_func()的同类函数还有</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-title function_ invoke__">call_user_func</span>()、<span class="hljs-title function_ invoke__">call_user_func_array</span>()、<span class="hljs-title function_ invoke__">array_map</span>()<br><span class="hljs-title function_ invoke__">usort</span>()、<span class="hljs-title function_ invoke__">uasort</span>()、<span class="hljs-title function_ invoke__">uksort</span>()、<span class="hljs-title function_ invoke__">array_filter</span>()<br><span class="hljs-title function_ invoke__">array_reduce</span>()、<span class="hljs-title function_ invoke__">array_diff_uassoc</span>()、<span class="hljs-title function_ invoke__">array_diff_ukey</span>()<br><span class="hljs-title function_ invoke__">array_udiff</span>()、<span class="hljs-title function_ invoke__">array_udiff_assoc</span>()、<span class="hljs-title function_ invoke__">array_udiff_uassoc</span>()<br><span class="hljs-title function_ invoke__">array_intersect_assoc</span>()、<span class="hljs-title function_ invoke__">array_intersect_uassoc</span>()<br><span class="hljs-title function_ invoke__">array_uintersect</span>()、<span class="hljs-title function_ invoke__">array_uintersect_assoc</span>()<br><span class="hljs-title function_ invoke__">array_uintersect_uassoc</span>()、<span class="hljs-title function_ invoke__">array_walk</span>()、<span class="hljs-title function_ invoke__">array_walk_recursive</span>()<br><span class="hljs-title function_ invoke__">xml_set_character_data_handler</span>()、<span class="hljs-title function_ invoke__">xml_set_default_handler</span>()<br><span class="hljs-title function_ invoke__">xml_set_element_handler</span>()、<span class="hljs-title function_ invoke__">xml_set_end_namespace_decl_handler</span>()<br><span class="hljs-title function_ invoke__">xml_set_external_entity_ref_handler</span>()、<span class="hljs-title function_ invoke__">xml_set_notation_decl_handler</span>()<br><span class="hljs-title function_ invoke__">xml_set_processing_instruction_handler</span>()<br><span class="hljs-title function_ invoke__">xml_set_start_namespace_decl_handler</span>()<br><span class="hljs-title function_ invoke__">xml_set_unparsed_entity_decl_handler</span>()、<span class="hljs-title function_ invoke__">stream_filter_register</span>()<br><span class="hljs-title function_ invoke__">set_error_handler</span>()、<span class="hljs-title function_ invoke__">register_shutdown_function</span>()、<span class="hljs-title function_ invoke__">register_tick_function</span>()<br></code></pre></td></tr></table></figure>
+
+<h5 id="漏洞防范-4"><a href="#漏洞防范-4" class="headerlink" title="漏洞防范"></a>漏洞防范</h5><p>在满足正常业务的需求下，采用白名单过滤参数。（最好的方法是禁止可控变量与该类函数接触）。</p>
+<h4 id="命令执行漏洞"><a href="#命令执行漏洞" class="headerlink" title="命令执行漏洞"></a>命令执行漏洞</h4><p>与代码执行漏洞不同，命令执行函数执行的是系统命令。但审计的思路和挖掘代码执行漏洞相同。</p>
+<p>与命令执行有关的函数有7个：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-title function_ invoke__">system</span>()<br><span class="hljs-title function_ invoke__">exec</span>()<br><span class="hljs-title function_ invoke__">shell_exec</span>()<br><span class="hljs-title function_ invoke__">passthru</span>()<br><span class="hljs-title function_ invoke__">pcntl_exec</span>()<br><span class="hljs-title function_ invoke__">popen</span>()<br><span class="hljs-title function_ invoke__">proc_open</span>()<br></code></pre></td></tr></table></figure>
+
+<p>另外反引号&#96;&#96; 也可以执行命令，其本质是调用shell_exec()函数。</p>
+<h5 id="漏洞防范-5"><a href="#漏洞防范-5" class="headerlink" title="漏洞防范"></a>漏洞防范</h5><p>在过滤可以使用escapeshellcmd()过滤整条命令，escapeshellarg()过滤参数。也可以采用参数白名单进行过滤。</p>
+<h4 id="变量覆盖漏洞"><a href="#变量覆盖漏洞" class="headerlink" title="变量覆盖漏洞"></a>变量覆盖漏洞</h4><p>经常引发该类漏洞的函数有extract()、parse_str()、import_request_variables()，其中import_request_variables()函数调用后相当于开起了全局变量注册，在5.4之后被取消。挖掘时还可以全局搜索$$来定位这种特殊的变量覆盖。</p>
+<h5 id="漏洞防范-6"><a href="#漏洞防范-6" class="headerlink" title="漏洞防范"></a>漏洞防范</h5><p>该漏洞出现的主要原因是因为没有判断变量是否已经存在。最直接的解决方法就是不进行变量注册，直接使用原生的$_GET和$_POST数组进行操作。如果使用了extract()函数，也可以配置第二个参数extract_type为EXTR_SKIP，及若有冲突，不覆盖变量。</p>
+<h4 id="逻辑漏洞"><a href="#逻辑漏洞" class="headerlink" title="逻辑漏洞"></a>逻辑漏洞</h4><p>逻辑漏洞往往与业务逻辑相关联，在审计过程中通过定位功能点的方式来挖掘漏洞比较有效。另外，配合黑盒测试也可以快速定位问题所在。除开业务逻辑外，一些函数本身也容易造成逻辑漏洞。如：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs PHP"><span class="hljs-title function_ invoke__">in_array</span>()<br><span class="hljs-title function_ invoke__">is_numeric</span>()<br>===<br>==			<br></code></pre></td></tr></table></figure>
+
+<p>再比如：在使用header()函数进行跳转时没有exit或return当前文件，导致PHP继续执行。</p>
+<h5 id="漏洞防范-7"><a href="#漏洞防范-7" class="headerlink" title="漏洞防范"></a>漏洞防范</h5><p>程序员应该对整个业务逻辑足够熟悉，才能写出精简而不画蛇添足的代码，其次应该熟悉编程语言的各种函数，了解各个函数的特点。</p>
+<h4 id="其他漏洞"><a href="#其他漏洞" class="headerlink" title="其他漏洞"></a>其他漏洞</h4><p>本文只列举了一部分漏洞，还有很多漏洞没有介绍，如：XXE、反序列化漏洞、SSRF等等。但其实大致审计思路都相似。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>代码审计是一个熟能生巧的技术，它不仅对审计人员的正向开发有较高的要求，还要求审计人员熟悉该编程语言的特性以及容易出现问题的地方。审计更是一个考验耐心的技术活，容不得一丝心浮气躁，细心方能挖遍天下。当然，PHP现在也正在淡出舞台，但代码审计的思想适用于每种语言。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Web/" class="category-chain-item">Web</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/PHP/">#PHP</a>
+      
+        <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">#代码审计</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>PHP代码审计简单总结</div>
+      <div>http://white9ash.fun/2023/01/01/PHP代码审计简单总结/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>white9ash</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年1月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/11/14/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%AE%80%E5%8D%95%E7%9A%84%E9%80%86%E5%90%91%E8%80%83%E8%AF%95%E9%A2%98%E5%88%86%E6%9E%90/" title="记一次简单的逆向考试题分析">
+                        <span class="hidden-mobile">记一次简单的逆向考试题分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"jqNMM9ep1H0gxulGGsP0rY3r-MdYXbMMI","appKey":"OUD3nHH8v5VFsz465lcPwcEW","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":true},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
